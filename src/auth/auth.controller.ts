@@ -22,7 +22,7 @@ export class AuthController {
     description:"Credenciais ja foram cadastradas"
   })
   @Post('/cadastrar')
-  singup(@Ip() Ip,  @Body() dto: AuthDto) : Promise<{ access_token: string }> {
+  singup(@Ip() ip,  @Body() dto: AuthDto) : Promise<{ access_token: string }> {
     console.log(dto);
     return this.authService.signup(dto, ip);
   }
@@ -39,7 +39,7 @@ export class AuthController {
     description:"Credenciais erradas ou não existem"
   })
   @Post('/logar')
-  singin(@Body() dto: AuthLogarDto) {
-    return this.authService.signin(dto);
+  singin(@Ip() ip, @Body() dto: AuthLogarDto) {
+    return this.authService.signin(dto, ip);
   }
 }

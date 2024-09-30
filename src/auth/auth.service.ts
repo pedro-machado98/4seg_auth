@@ -17,7 +17,7 @@ export class AuthService {
     private logger: MyLoggerService,
   ) {}
 
-  async signup(dto: AuthDto) {
+  async signup(dto: AuthDto, ip:any) {
     //gerar o hash da senha
     const hash = await argon.hash(dto.password);
 
@@ -27,7 +27,8 @@ export class AuthService {
         data: {
           username: dto.username,
           hash: hash,
-          role: dto.role
+          role: dto.role,
+          IPAutorizado: ip
         },
       });
 
@@ -49,17 +50,18 @@ export class AuthService {
     }
   }
 
-  async signin(dto: AuthLogarDto) {
+  async signin(dto: AuthLogarDto, ip:any) {
     this.logger.log(`Tentativa de login do usuário ${dto.username}`);
     
     const user = await this.prisma.user.findUnique({
       where: {
         username: dto.username,
+        IPAutorizado: ip
       },
     });
 
-    if (!user) {
-      this.logger.warn(`Tentativa de login com credenciais inválidas: ${dto.username}`);
+    if (!user || user.IPAutorizado !== ip) {
+      this.logger.warn(`Tentativa de login com credenciais ou ip inválido: ${dto.username}`);
       throw new ForbiddenException('Credenciais erradas ou não existem');
     }
 
