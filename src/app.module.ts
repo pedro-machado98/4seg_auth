@@ -9,6 +9,7 @@ import { MyLoggerModule } from './my-logger/my-logger.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProfessorModule } from './professor/professor.module';
 import { UserModule } from './user/user.module';
+import { NotasModule } from './notas/notas.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UserModule } from './user/user.module';
     MyLoggerModule,
     AlunoModule,
     ProfessorModule,
+    NotasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

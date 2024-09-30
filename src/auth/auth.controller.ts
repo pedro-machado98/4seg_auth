@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Ip, Post } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
@@ -22,9 +22,9 @@ export class AuthController {
     description:"Credenciais ja foram cadastradas"
   })
   @Post('/cadastrar')
-  singup(@Body() dto: AuthDto) : Promise<{ access_token: string }> {
+  singup(@Ip() Ip,  @Body() dto: AuthDto) : Promise<{ access_token: string }> {
     console.log(dto);
-    return this.authService.signup(dto);
+    return this.authService.signup(dto, ip);
   }
 
   @ApiCreatedResponse({
