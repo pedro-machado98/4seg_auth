@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import { AlunoModule } from './aluno/aluno.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { UserModule } from './user/user.module';
 import { MyLoggerModule } from './my-logger/my-logger.module';
-import { AluneModule } from './alune/alune.module';
-import { AlunoModule } from './aluno/aluno.module';
+import { PrismaModule } from './prisma/prisma.module';
 import { ProfessorModule } from './professor/professor.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { ProfessorModule } from './professor/professor.module';
     UserModule,
     PrismaModule,
     MyLoggerModule,
-    AluneModule,
     AlunoModule,
     ProfessorModule,
   ],
