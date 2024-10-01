@@ -13,7 +13,7 @@ type AuthRequest = HttpRequest & { user: UserJwtPayload }
 @ApiTags('Dados do Usuario')
 @Controller('users')
 export class UserController {
-  // /users/me
+
   @UseGuards(JwtGuard)
   @Get('eu')
   getDadosDoUsuario(@Req() req: AuthRequest) {

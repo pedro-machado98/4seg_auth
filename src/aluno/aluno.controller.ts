@@ -1,13 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { HasRoles } from 'src/auth/decorator/has-roles.decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 
 import { Role } from '../auth/model/role.enum';
+import { Logger } from 'winston';
 
 @Controller('aluno')
 @UseGuards(JwtGuard, RolesGuard)
 export class AlunoController {
+
+    constructor(
+        @Inject('winston')
+        private readonly logger: Logger,
+    ) { }
 
     @HasRoles(Role.Admin)
     @Get()

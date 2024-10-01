@@ -19,8 +19,8 @@ model User {
   username String @unique
   hash String
 
-  nome String
-  email String
+  nome String?
+  email String?
   IPAutorizado String
 
   role String
