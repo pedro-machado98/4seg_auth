@@ -1,9 +1,9 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as argon from 'argon2';
-import { MyLoggerService } from 'src/my-logger/my-logger.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { AuthDto, AuthLogarDto } from './dto';
@@ -14,7 +14,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
-    private logger: MyLoggerService,
+    private readonly mailService: MailerService
   ) {}
 
   async signup(dto: AuthDto, ip:any) {
@@ -28,30 +28,25 @@ export class AuthService {
           username: dto.username,
           hash: hash,
           role: dto.role,
-          IPAutorizado: ip
+          IPAutorizado: ip,
+          email: dto.email,
+          loginErrado: false
         },
       });
 
-      // Log de sucesso no cadastro
-      this.logger.log(`Usuário ${dto.username} cadastrado com sucesso`);
-
-      //retornar o usuario salvo
       return this.signToken(user.id, user.username);
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         if (e.code === 'P2002') {
-          this.logger.warn(`Tentativa de cadastro com credenciais duplicadas: ${dto.username}`);
           throw new ForbiddenException('Credenciais já foram cadastradas');
         }
       } else {
-        this.logger.error(`Erro desconhecido ao cadastrar usuário ${dto.username}: ${e.message}`);
         throw e;
       }
     }
   }
 
   async signin(dto: AuthLogarDto, ip:any) {
-    this.logger.log(`Tentativa de login do usuário ${dto.username}`);
     
     const user = await this.prisma.user.findUnique({
       where: {
@@ -61,18 +56,18 @@ export class AuthService {
     });
 
     if (!user || user.IPAutorizado !== ip) {
-      this.logger.warn(`Tentativa de login com credenciais ou ip inválido: ${dto.username}`);
       throw new ForbiddenException('Credenciais erradas ou não existem');
     }
 
     const pwMatches = await argon.verify(user.hash, dto.password);
 
     if (!pwMatches) {
-      this.logger.warn(`Login falhou para o usuário ${dto.username}: senha incorreta`);
       throw new ForbiddenException('Credenciais erradas');
+      let number = Math.random() * (100000 - 999999) + 999999
+      user.codigoValidador = number;
+      this.sendMail(user.email, number)
     }
 
-    this.logger.log(`Login bem-sucedido para o usuário ${dto.username}`);
     return this.signToken(user.id, user.username);
   }
 
@@ -88,10 +83,23 @@ export class AuthService {
       secret: secret,
     });
 
-    this.logger.log(`Token gerado para o usuário ID: ${userId}`);
     
     return {
       access_token: token,
     };
   }
+
+  async sendMail(email, codigoValidador) {
+    const message = `Esqueceu sua senha? Digite o codigo ${codigoValidador} para revalidar sua conta.`;
+
+
+
+    this.mailService.sendMail({
+      from: 'Pedro Machado <pedromachado2298@gmail.com>',
+      to: email,
+      subject: `Revalide sua conta.`,
+      text: message,
+    });
+  }
+
 }

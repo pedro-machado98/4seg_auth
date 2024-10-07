@@ -13,6 +13,10 @@ export class AuthDto {
   
   @IsNotEmpty()
   @IsString()
-  role:string
+  role: string
+
+  @IsNotEmpty()
+  @IsString()
+  email: string
 
 }

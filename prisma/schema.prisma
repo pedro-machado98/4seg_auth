@@ -20,8 +20,10 @@ model User {
   hash String
 
   nome String?
-  email String?
+  email String
   IPAutorizado String
+  loginErrado Boolean @default(false)
+  codigoValidador Int? 
 
   role String
   
